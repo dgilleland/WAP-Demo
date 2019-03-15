@@ -2,14 +2,68 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Configuration;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Backend
 {
-    public class SecurityContext : DbContext
+    public static class SecurityController
+    {
+        #region Fixed security roles
+        public const string SUser = nameof(SUser);
+        #endregion
+        public static LoggedInUser FindOrCreateAccount()
+        {
+            return FindOrCreateAccount(Thread.CurrentPrincipal?.Identity?.Name);
+        }
+        public static LoggedInUser FindOrCreateAccount(string windowsAccountName)
+        {
+            if (string.IsNullOrWhiteSpace(windowsAccountName))
+                throw new ArgumentNullException(nameof(windowsAccountName), "You must supply some windows account name");
+            using (var context = new SecurityContext())
+            {
+                var found = context.UserAccounts.SingleOrDefault(x => x.WindowsAccount.Equals(windowsAccountName));
+                if(found == null)
+                {
+                    // Create it as a new account
+                    found = context.UserAccounts.Add(new UserAccount { WindowsAccount = windowsAccountName });
+                    context.SaveChanges();
+                    if(windowsAccountName == ConfigurationManager.AppSettings[SUser])
+                    {
+                        var adminRole = context.SecurityRoles.SingleOrDefault(x => x.Name == SUser);
+                        if(adminRole == null)
+                        {
+                            // Make the Admin role
+                            context.SecurityRoles.Add(new SecurityRole { Name = SUser });
+                            context.SaveChanges();
+                            adminRole = context.SecurityRoles.SingleOrDefault(x => x.Name == SUser);
+                        }
+                        context.Permissions.Add(new Permission { SecurityRoleID = adminRole.SecurityRoleID, UserAccountID = found.UserAccountID });
+                        context.SaveChanges();
+                    }
+                }
+                var result = new LoggedInUser
+                {
+                    AccountID = found.UserAccountID,
+                    DisplayName = found.DisplayName,
+                    SecurityRoles = found.Roles.Select(x => x.SecurityRole.Name).ToList()
+                };
+                return result;
+            }
+        }
+    }
+    public class LoggedInUser
+    {
+        public int AccountID { get; set; }
+        public string DisplayName { get; set; }
+        public ICollection<string> SecurityRoles { get; set; }
+            = new HashSet<string>();
+    }
+    internal class SecurityContext : DbContext
     {
         public SecurityContext() : base("name=DefaultConnection")
         {
@@ -21,11 +75,14 @@ namespace Backend
     }
 
     [Table("UserAccounts", Schema = "Security")]
-    public class UserAccount
+    internal class UserAccount
     {
         [Key]
         public int UserAccountID { get; set; }
+        [Required, Index("IX_UserAccount_Name", IsUnique = true)]
+        [MaxLength(200)]
         public string WindowsAccount { get; set; }
+        [MaxLength(200)]
         public string DisplayName { get; set; }
 
         // Navigation Properties
@@ -33,7 +90,7 @@ namespace Backend
         = new HashSet<Permission>();
     }
     [Table("Permissions", Schema = "Security")]
-    public class Permission
+    internal class Permission
     {
         // Composite key
         [Key, Column(Order = 1)]
@@ -47,15 +104,14 @@ namespace Backend
         public virtual SecurityRole SecurityRole { get; set; }
     }
     [Table("SecurityRoles", Schema = "Security")]
-    public class SecurityRole
+    internal class SecurityRole
     {
-        #region Fixed security roles
-        public const string SUser = nameof(SUser);
-        #endregion
-
         [Key]
         public int SecurityRoleID { get; set; }
+        [Required]
+        [MaxLength(32)]
         public string Name { get; set; }
+        [MaxLength(1000)]
         public string Description { get; set; }
         // Navigation Properties
         public virtual ICollection<Permission> Users { get; set; }
