@@ -16,11 +16,16 @@ namespace OffTheCuff.Controllers
             var data = controller.GetCourseInfo(5);
             return View(data);
         }
-        //[HttpPost]
-        //public ActionResult Index(Course data)
-        //{
-        //    return View(data);
-        //}
+        [HttpPost]
+        public ActionResult MakeWork([Bind(Prefix = "work")] Assignment work)
+        {
+            // TODO: Fix this bug, and figure out how the model binding works again
+            var controller = BackEndController.Instance;
+            var data = controller.GetCourseInfo(5);
+            //var work = new Assignment { Name = name, Weight = weight };
+            data.Assignments.Add(work);
+            return View("Index", data);
+        }
         [HttpPost]
         public ActionResult Index(Student me)
         {
