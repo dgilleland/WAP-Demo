@@ -1,7 +1,8 @@
 ﻿@model OffTheCuff.Models.Student
 
-<form method="post">
+@using (var form = Html.BeginForm("Index", "Home", FormMethod.Post))
+{
     @Html.EditorFor(x => x.Name)
     @Html.EditorFor(x => x.ID)
     <input type="submit" value="Stuff" />
-</form>
+}
