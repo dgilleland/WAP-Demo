@@ -1,0 +1,34 @@
+﻿@model OffTheCuff.Models.Course
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="jumbotron">
+    <h1>ASP.NET</h1>
+    @if (Model != null)
+    {
+
+        <div>
+            @Html.DisplayFor(x => x.Info)
+         <form method="post">
+             <input type="submit" name="Whatever" value="Submit" />
+         </form>   
+        </div>
+        
+    }
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        @Html.DisplayFor(x => x.Assignments)
+    </div>
+    <div class="col-md-4">
+        @{ 
+            var me = new OffTheCuff.Models.Student { Name = "me", ID = 4 };
+        }
+        @Html.EditorFor(x => me)
+    </div>
+    <div class="col-md-4">
+        @Html.DisplayFor(x => x.Students)
+    </div>
+</div>
