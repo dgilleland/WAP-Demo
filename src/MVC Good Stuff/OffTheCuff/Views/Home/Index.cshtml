@@ -24,12 +24,12 @@
     </div>
     <div class="col-md-4">
         @{ 
-            var me = new OffTheCuff.Models.Student { Name = "me", ID = 4 };
-            var work = new OffTheCuff.Models.Assignment();
-        }
-        @Html.EditorFor(x => me)
+                var me = new OffTheCuff.Models.Student { Name = "me", ID = 4 };
+                var help = new OffTheCuff.Models.Assignment();
+            }
+            @Html.EditorFor(x => me)
         <hr />
-        @Html.EditorFor(x => work)
+        @Html.EditorFor(x => help)
     </div>
     <div class="col-md-4">
         @Html.DisplayFor(x => x.Students)

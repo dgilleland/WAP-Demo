@@ -17,13 +17,13 @@ namespace OffTheCuff.Controllers
             return View(data);
         }
         [HttpPost]
-        public ActionResult MakeWork([Bind(Prefix = "work")] Assignment work)
+        public ActionResult MakeWork(Assignment help)
         {
             // TODO: Fix this bug, and figure out how the model binding works again
             var controller = BackEndController.Instance;
             var data = controller.GetCourseInfo(5);
             //var work = new Assignment { Name = name, Weight = weight };
-            data.Assignments.Add(work);
+            data.Assignments.Add(help);
             return View("Index", data);
         }
         [HttpPost]

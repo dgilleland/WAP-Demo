@@ -19,8 +19,8 @@ namespace OffTheCuff.Models
     }
     public class Assignment
     {
-        public string Name { get; internal set; }
-        public int Weight { get; internal set; }
+        public string Name { get; set; }
+        public int Weight { get; set; }
     }
     public class Student
     {

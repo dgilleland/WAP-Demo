@@ -1,6 +1,6 @@
 ﻿@model OffTheCuff.Models.Assignment
 
-@using (var form = Html.BeginForm("MakeWork", "Home", new { },FormMethod.Post))
+@using (var form = Html.BeginForm("MakeWork", "Home", FormMethod.Post))
 {
     @Html.EditorFor(x => x.Name)
     @Html.EditorFor(x => x.Weight)
