@@ -1,4 +1,4 @@
-# WAP-Demo
+# WAP-Demo - cool stuff
 
 > Things to Learn
 
