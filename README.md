@@ -1,4 +1,4 @@
-# WAP-Demo
+# WAP-Demo - See src folder
 
 > Things to Learn
 
